@@ -208,7 +208,7 @@ fx.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
 2. `SetBank("xxx")` の部分を確認する → これが Bank 名
 3. `PlayAnimation("yyy")` の部分を確認する → これが使えるアニメーション名
 
-> **Tips**: DST 本体のスクリプトは `C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\data\scripts\prefabs\` にあります。テキストエディタで開いて `SetBank` を検索すると、どんな Bank が使われているか確認できます。
+> **Tips**: DST 本体のスクリプトは ZIP にバンドルされています。`C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\data\databundles\scripts.zip` を展開すると `scripts\prefabs\` フォルダが見つかります。テキストエディタで開いて `SetBank` を検索すると、どんな Bank が使われているか確認できます。
 
 ---
 
