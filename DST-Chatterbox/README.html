@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatterbox TTS - キャラクター音声ジェネレーター</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #faf9f7;
+    --bg-card: #ffffff;
+    --bg-warm: #f5f0eb;
+    --bg-dark: #191919;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6560;
+    --text-light: #9a938d;
+    --accent-warm: #c4704b;
+    --accent-green: #2d7a5f;
+    --accent-red: #b85450;
+    --border: #e8e2db;
+    --border-light: #f0ece7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.8;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Hero */
+  .hero {
+    background: var(--bg-dark);
+    color: #fff;
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(196,112,75,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+  }
+  .hero-label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .hero h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  /* Main */
+  .content {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* Section */
+  .section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .section h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .section h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 40px 0 16px;
+    line-height: 1.5;
+  }
+  .section p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 2;
+    font-weight: 300;
+  }
+
+  /* Callout */
+  .callout {
+    margin: 24px 0;
+    padding: 24px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.9;
+    font-weight: 300;
+    color: var(--text-primary);
+  }
+  .callout strong {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .callout.warn {
+    background: #fef8f0;
+    border-left: 3px solid var(--accent-warm);
+  }
+  .callout.warn strong { color: var(--accent-warm); }
+  .callout.info {
+    background: #eff8ff;
+    border-left: 3px solid #1d6fa5;
+  }
+  .callout.info strong { color: #1d6fa5; }
+  .callout.accent {
+    background: #fef3ef;
+    border-left: 3px solid var(--accent-warm);
+  }
+  .callout.accent strong { color: var(--accent-warm); }
+
+  /* Quick Start */
+  .qs-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .qs-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 16px;
+    text-align: center;
+  }
+  .qs-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--accent-warm);
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+  }
+  .qs-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .qs-desc {
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 300;
+  }
+
+  /* Code */
+  code {
+    background: var(--bg-warm);
+    color: var(--accent-warm);
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 0.85em;
+  }
+  pre {
+    background: #1e1e1e;
+    border-radius: 12px;
+    padding: 24px 28px;
+    overflow-x: auto;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #d4d4d4;
+    margin: 20px 0;
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+  .hl-str { color: #ce9178; }
+  .hl-num { color: #b5cea8; }
+  .hl-var { color: #9cdcfe; }
+  .hl-cmt { color: #6a9955; }
+
+  /* Diagram Card */
+  .diagram {
+    margin: 32px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 36px;
+  }
+  .diagram-title {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 28px;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  /* Flow */
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+  .flow-box {
+    padding: 16px 24px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    min-width: 120px;
+  }
+  .flow-box.source { background: var(--bg-warm); color: var(--text-primary); }
+  .flow-box.engine { background: linear-gradient(135deg, #fef3ef 0%, #fce8e0 100%); color: var(--accent-warm); border: 2px solid var(--accent-warm); padding: 20px 28px; }
+  .flow-box.output { background: var(--bg-warm); color: var(--text-primary); }
+  .flow-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 12px;
+    color: var(--text-light);
+  }
+  .flow-connector .arrow { font-size: 20px; line-height: 1; }
+
+  /* Tree */
+  .tree {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 2;
+    margin: 24px 0;
+  }
+  .tree-root { font-weight: 700; color: var(--text-primary); }
+  .tree-row { display: flex; align-items: baseline; gap: 10px; }
+  .tree-sym { color: var(--text-light); flex-shrink: 0; }
+  .tree-file { color: var(--accent-warm); font-weight: 500; }
+  .tree-dir { color: var(--text-primary); font-weight: 600; }
+  .tree-auto { color: var(--text-light); font-style: italic; }
+  .tree-note { color: var(--text-light); font-family: 'Noto Sans JP', sans-serif; font-size: 13px; }
+
+  /* Panel Grid */
+  .panel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .panel-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .panel-val { font-family: 'Noto Serif JP', serif; font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .panel-sub { font-size: 13px; color: var(--text-secondary); font-weight: 300; }
+  .panel-sub a { color: var(--accent-warm); text-decoration: none; }
+  .panel-sub a:hover { text-decoration: underline; }
+
+  /* Steps */
+  .steps { display: flex; flex-direction: column; margin: 24px 0; }
+  .step { display: flex; gap: 24px; position: relative; }
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 19px; top: 48px; bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .step-dot {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-warm);
+    color: var(--accent-warm);
+    font-weight: 700; font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: var(--bg-card);
+    position: relative; z-index: 1;
+  }
+  .step-content { padding-bottom: 32px; flex: 1; }
+  .step-title { font-weight: 600; font-size: 16px; margin-bottom: 8px; }
+  .step-text { color: var(--text-secondary); font-size: 15px; font-weight: 300; line-height: 2; }
+  .step-text a { color: var(--accent-warm); text-decoration: none; }
+  .step-text a:hover { text-decoration: underline; }
+
+  /* Table */
+  .tbl-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 24px 0;
+  }
+  .tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  .tbl th {
+    text-align: left;
+    padding: 14px 20px;
+    color: var(--text-light);
+    font-weight: 500;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 2px solid var(--border);
+    background: var(--bg-primary);
+  }
+  .tbl td {
+    padding: 14px 20px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-light);
+    font-weight: 300;
+  }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl td:first-child { color: var(--text-primary); font-weight: 500; }
+
+  /* Struct Grid */
+  .struct-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .struct-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .struct-label { font-family: 'Consolas', monospace; font-weight: 600; color: var(--accent-warm); font-size: 15px; margin-bottom: 6px; }
+  .struct-desc { color: var(--text-secondary); font-size: 14px; font-weight: 300; line-height: 1.8; }
+
+  /* Perf Grid */
+  .perf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .perf-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .perf-val { font-family: 'Noto Serif JP', serif; font-size: 24px; font-weight: 700; color: var(--accent-warm); }
+  .perf-label { font-size: 14px; color: var(--text-secondary); margin-top: 6px; font-weight: 300; }
+
+  /* Param */
+  .param {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 16px;
+  }
+  .param-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .param-name { font-family: 'Consolas', monospace; font-weight: 700; color: var(--text-primary); font-size: 16px; }
+  .param-badge { font-size: 12px; color: var(--text-light); background: var(--bg-warm); border-radius: 6px; padding: 3px 10px; }
+  .param-text { color: var(--text-secondary); font-size: 15px; margin-bottom: 16px; font-weight: 300; line-height: 1.9; }
+  .param-bar { display: flex; height: 6px; border-radius: 99px; overflow: hidden; margin-bottom: 12px; }
+  .bar-seg { height: 100%; }
+  .param-labels { display: flex; gap: 20px; flex-wrap: wrap; }
+  .param-lbl { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); font-weight: 400; }
+  .param-dot { width: 8px; height: 8px; border-radius: 3px; }
+
+  /* Accordion */
+  .acc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .acc-head {
+    padding: 20px 24px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-primary);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .acc-head::after {
+    content: '+';
+    color: var(--text-light);
+    font-size: 20px;
+    font-weight: 300;
+    flex-shrink: 0;
+    margin-left: 16px;
+  }
+  .acc.open .acc-head::after { content: '\2212'; }
+  .acc-body {
+    display: none;
+    padding: 0 24px 24px;
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 2;
+    border-top: 1px solid var(--border-light);
+  }
+  .acc.open .acc-body { display: block; padding-top: 20px; }
+  .acc-steps { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .acc-step { display: flex; align-items: baseline; gap: 12px; }
+  .acc-icon {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--bg-warm);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .acc a { color: var(--accent-warm); text-decoration: none; }
+  .acc a:hover { text-decoration: underline; }
+
+  /* Conclusion (for DST MOD section) */
+  .conclusion {
+    background: var(--bg-dark);
+    color: #fff;
+    border-radius: 20px;
+    padding: 48px;
+    margin: 32px 0;
+  }
+  .conclusion h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+  .conclusion p {
+    color: rgba(255,255,255,0.7);
+    font-size: 15px;
+    line-height: 2;
+    font-weight: 300;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 48px 0;
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 300;
+  }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 28px; }
+    .hero { padding: 72px 0 56px; }
+    .content { padding: 0 24px; }
+    .hero-inner { padding: 0 24px; }
+    .qs-grid { grid-template-columns: repeat(2, 1fr); }
+    .panel-grid { grid-template-columns: 1fr 1fr; }
+    .struct-grid { grid-template-columns: 1fr; }
+    .perf-grid { grid-template-columns: 1fr; }
+    .flow { flex-direction: column; gap: 8px; }
+    .flow-connector { flex-direction: row; padding: 4px 0; }
+    .flow-connector .arrow { transform: rotate(90deg); }
+    .conclusion { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-label">Chatterbox TTS</div>
+      <h1>キャラクター音声ジェネレーター</h1>
+      <div class="hero-sub">参照音声をもとに、任意のキャラクターの声で新しいセリフを生成するツール</div>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- クイックスタート -->
+    <section class="section">
+      <div class="section-label">Quick Start</div>
+      <h2>クイックスタート</h2>
+      <div class="qs-grid">
+        <div class="qs-card">
+          <div class="qs-num">1</div>
+          <div class="qs-title">セットアップ</div>
+          <div class="qs-desc"><code>01_setup.bat</code> を実行（初回のみ）</div>
+        </div>
+        <div class="qs-card">
+          <div class="qs-num">2</div>
+          <div class="qs-title">参照音声を配置</div>
+          <div class="qs-desc"><code>wav/</code> に参照WAVファイルを入れる</div>
+        </div>
+        <div class="qs-card">
+          <div class="qs-num">3</div>
+          <div class="qs-title">セリフを設定</div>
+          <div class="qs-desc"><code>generate_voice.py</code> の LINES を編集</div>
+        </div>
+        <div class="qs-card">
+          <div class="qs-num">4</div>
+          <div class="qs-title">生成</div>
+          <div class="qs-desc"><code>02_generate.bat</code> を実行</div>
+        </div>
+        <div class="qs-card">
+          <div class="qs-num">5</div>
+          <div class="qs-title">保存</div>
+          <div class="qs-desc">気に入った結果を <code>success/</code> へ</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 仕組み -->
+    <section class="section">
+      <div class="section-label">How it works</div>
+      <h2>仕組み</h2>
+      <p>Chatterbox TTSは「参照音声の声質」と「テキスト（セリフ）」を組み合わせて新しい音声を生成します。</p>
+
+      <div class="diagram">
+        <div class="diagram-title">処理フロー</div>
+        <div class="flow">
+          <div class="flow-box source">参照音声<br><small>wav/</small></div>
+          <div class="flow-connector"><span class="arrow">→</span></div>
+          <div class="flow-box engine">Chatterbox TTS<br><small>AI合成エンジン</small></div>
+          <div class="flow-connector"><span class="arrow">→</span></div>
+          <div class="flow-box output">生成音声<br><small>output/</small></div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <strong>覚えておくべきポイント</strong>
+        参照音声が「どんな声か」を、テキストが「何を喋るか」を決めます。生成エンジンは確率的に動作するため、同じ設定でも毎回異なる結果が出ます。
+      </div>
+    </section>
+
+    <!-- フォルダ構成 -->
+    <section class="section">
+      <div class="section-label">Structure</div>
+      <h2>フォルダ構成</h2>
+      <div class="tree">
+        <div class="tree-root">プロジェクトフォルダ/</div>
+        <div class="tree-row"><span class="tree-sym">├──</span><span class="tree-file">01_setup.bat</span><span class="tree-note">　初回セットアップ（仮想環境構築・ライブラリインストール）</span></div>
+        <div class="tree-row"><span class="tree-sym">├──</span><span class="tree-file">02_generate.bat</span><span class="tree-note">　音声生成の実行</span></div>
+        <div class="tree-row"><span class="tree-sym">├──</span><span class="tree-file">generate_voice.py</span><span class="tree-note">　メインスクリプト（テキスト・参照ファイル・パラメータを設定）</span></div>
+        <div class="tree-row"><span class="tree-sym">├──</span><span class="tree-file">README.md / .html</span><span class="tree-note">　このドキュメント</span></div>
+        <div class="tree-row"><span class="tree-sym">├──</span><span class="tree-dir">wav/</span><span class="tree-note">　参照音声ファイルを置くフォルダ</span></div>
+        <div class="tree-row"><span class="tree-sym">├──</span><span class="tree-dir">output/</span><span class="tree-note">　生成された音声ファイルの出力先（自動）</span></div>
+        <div class="tree-row"><span class="tree-sym">├──</span><span class="tree-dir">success/</span><span class="tree-note">　気に入った音声を手動で保存する場所</span></div>
+        <div class="tree-row"><span class="tree-sym">└──</span><span class="tree-auto">venv/</span><span class="tree-note">　Python仮想環境（自動生成・直接編集しない）</span></div>
+      </div>
+    </section>
+
+    <!-- 必要な環境 -->
+    <section class="section">
+      <div class="section-label">Requirements</div>
+      <h2>必要な環境</h2>
+      <div class="panel-grid">
+        <div class="panel">
+          <div class="panel-label">Python</div>
+          <div class="panel-val">3.11</div>
+          <div class="panel-sub"><a href="https://www.python.org/downloads/release/python-3119/">Python 3.11.9 推奨</a></div>
+        </div>
+        <div class="panel">
+          <div class="panel-label">OS</div>
+          <div class="panel-val">Windows</div>
+          <div class="panel-sub">Windows 10 / 11</div>
+        </div>
+        <div class="panel">
+          <div class="panel-label">ディスク容量</div>
+          <div class="panel-val">15 GB 以上</div>
+          <div class="panel-sub">モデルファイル含む</div>
+        </div>
+        <div class="panel">
+          <div class="panel-label">GPU</div>
+          <div class="panel-val">オプション</div>
+          <div class="panel-sub">あると処理が大幅に高速化</div>
+        </div>
+      </div>
+      <div class="callout warn">
+        <strong>Python バージョンに注意</strong>
+        Python 3.12以降では一部ライブラリが対応していない場合があります。必ず3.11系を使用してください。
+      </div>
+    </section>
+
+    <!-- セットアップ手順 -->
+    <section class="section">
+      <div class="section-label">Setup</div>
+      <h2>セットアップ手順</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-dot">1</div>
+          <div class="step-content">
+            <div class="step-title">Pythonのインストール</div>
+            <div class="step-text">
+              <a href="https://www.python.org/downloads/release/python-3119/">Python 3.11.9</a> をダウンロードしてインストールします。
+            </div>
+            <div class="callout warn">
+              <strong>初心者向け：PATH設定を忘れずに</strong>
+              インストーラーの最初の画面で「Add python.exe to PATH」のチェックボックスを必ずオンにしてください。これをオフのままにすると以降のセットアップが全て失敗します。<br><br>
+              別バージョン（3.12等）が既にインストールされている場合、パスの優先順位で意図しないバージョンが使われることがあります。コマンドプロンプトで <code>python --version</code> を実行して確認してください。
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">2</div>
+          <div class="step-content">
+            <div class="step-title">初期セットアップ</div>
+            <div class="step-text">
+              <code>01_setup.bat</code> をダブルクリックして実行します。仮想環境の作成とライブラリのインストールが行われます。所要時間は約5〜10分です。
+            </div>
+            <div class="callout info">
+              <strong>初心者向け：WARNINGは気にしなくてOK</strong>
+              インストール中に赤い文字の警告（WARNING）が出ることがありますが、ERROR でなければ基本的に問題ありません。
+            </div>
+            <div class="callout warn">
+              <strong>初心者向け：フォルダのパスに注意</strong>
+              プロジェクトフォルダを日本語や全角文字を含むパスに置かないでください（例：<code>C:\Users\太郎\デスクトップ\</code>）。英数字のみのパスでないとエラーが発生する場合があります。
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">3</div>
+          <div class="step-content">
+            <div class="step-title">参照音声ファイルの配置</div>
+            <div class="step-text">
+              <code>wav/</code> フォルダに参照音声ファイルを配置します。次の「参照音声の準備」セクションを参照してください。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 参照音声ファイルの準備 -->
+    <section class="section">
+      <div class="section-label">Reference Audio</div>
+      <h2>参照音声ファイルの準備</h2>
+      <p>参照音声はAIが「声の雰囲気」を学習するための素材です。この品質が最終結果のクオリティに直結するため、丁寧に準備してください。</p>
+
+      <h3>入手方法</h3>
+      <div class="struct-grid">
+        <div class="struct-item">
+          <div class="struct-label">ゲームファイルから抽出</div>
+          <div class="struct-desc">各ゲームのMODツールやデータ展開ツールを使用して音声データを取り出す</div>
+        </div>
+        <div class="struct-item">
+          <div class="struct-label">ファンサイトから取得</div>
+          <div class="struct-desc">公式Wikiやファンコミュニティに音声ファイルがまとまっている場合がある</div>
+        </div>
+      </div>
+
+      <h3>推奨フォーマット</h3>
+      <div class="panel-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="panel">
+          <div class="panel-label">形式</div>
+          <div class="panel-val">WAV</div>
+          <div class="panel-sub">.wav ファイル</div>
+        </div>
+        <div class="panel">
+          <div class="panel-label">サンプルレート</div>
+          <div class="panel-val">16kHz</div>
+          <div class="panel-sub">44.1/48kHzも動作可</div>
+        </div>
+        <div class="panel">
+          <div class="panel-label">チャンネル</div>
+          <div class="panel-val">モノラル</div>
+          <div class="panel-sub">ステレオでも可</div>
+        </div>
+      </div>
+
+      <h3>品質を上げるためのポイント</h3>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr><th>ポイント</th><th>説明</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1セリフ = 1ファイル</td><td>複数セリフが連結されたファイルは使わない。1つのセリフだけが入ったWAVを用意する</td></tr>
+            <tr><td>ノイズを避ける</td><td>BGMやSEが混入した音声は品質低下の原因。クリーンな音声を選ぶ</td></tr>
+            <tr><td>感情・トーンを合わせる</td><td>叫び声の参照で穏やかなセリフを生成すると不自然になりやすい。生成したいセリフの雰囲気に近い参照音声を使う</td></tr>
+            <tr><td>短い音声を使う</td><td>1〜5秒程度の短いセリフが最も安定した結果を得やすい</td></tr>
+            <tr><td>英数字のファイル名</td><td>日本語・全角文字のファイル名はパスの問題でエラーになる場合がある</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 使い方 -->
+    <section class="section">
+      <div class="section-label">Usage</div>
+      <h2>使い方</h2>
+
+      <h3>セリフの設定</h3>
+      <p><code>generate_voice.py</code> の <code>LINES</code> セクションを編集して、生成したいセリフを設定します。</p>
+
+      <div class="struct-grid">
+        <div class="struct-item">
+          <div class="struct-label">ファイル上部</div>
+          <div class="struct-desc"><code>REF_CAPTAIN</code> などの定数で参照WAVファイルのパスを定義</div>
+        </div>
+        <div class="struct-item">
+          <div class="struct-label">LINES セクション</div>
+          <div class="struct-desc">生成するテキスト・参照ファイル・パラメータを辞書形式で定義</div>
+        </div>
+      </div>
+
+      <pre><code><span class="hl-var">LINES</span> = {
+    <span class="hl-str">"yes_sir"</span>: {
+        <span class="hl-str">"text"</span>: <span class="hl-str">"Yes sir!"</span>,          <span class="hl-cmt"># 生成するセリフ</span>
+        <span class="hl-str">"ref"</span>:  <span class="hl-var">REF_YESSIR</span>,           <span class="hl-cmt"># 参照音声（声の基準）</span>
+        <span class="hl-str">"exaggeration"</span>: <span class="hl-num">0.5</span>,         <span class="hl-cmt"># 感情の強度</span>
+        <span class="hl-str">"cfg"</span>:          <span class="hl-num">0.5</span>,         <span class="hl-cmt"># 参照音声への忠実度</span>
+    },
+    <span class="hl-cmt"># "disabled": { ... },        &larr; # を付けると生成されない</span>
+}</code></pre>
+
+      <div class="callout warn">
+        <strong>初心者向け：カンマに注意</strong>
+        Pythonの辞書はカンマの位置が重要です。各 <code>}</code> の後にカンマ <code>,</code> を忘れると文法エラーになります。既存の行をコピペして編集するのが安全です。
+      </div>
+
+      <h3>音声を生成する</h3>
+      <p><code>02_generate.bat</code> をダブルクリックして実行します。初回はモデルファイル（数GB）のダウンロードが発生します。</p>
+
+      <div class="perf-grid">
+        <div class="perf-card">
+          <div class="perf-val">30秒〜数分</div>
+          <div class="perf-label">CPUのみの場合（1行あたり）</div>
+        </div>
+        <div class="perf-card">
+          <div class="perf-val">数秒</div>
+          <div class="perf-label">GPU搭載の場合（NVIDIA RTX推奨）</div>
+        </div>
+      </div>
+
+      <h3>結果を保存する</h3>
+      <p>生成されたWAVファイルは <code>output/</code> に自動保存されます。同じ名前のファイルは上書きされるため、気に入った結果は <code>success/</code> へ移動してください。</p>
+      <div class="callout accent">
+        <strong>ポイント</strong>
+        同じ設定でも実行するたびに異なる結果が出ます。納得のいく結果が出るまで何度か実行して、複数の候補から最も良いものを選ぶのがおすすめです。
+      </div>
+    </section>
+
+    <!-- 音声パラメータの調整 -->
+    <section class="section">
+      <div class="section-label">Parameters</div>
+      <h2>音声パラメータの調整</h2>
+      <div class="callout info" style="margin-top:0;">
+        <strong>おすすめの始め方</strong>
+        まずは exaggeration=0.5、cfg=0.5 で試して、結果を聞きながら 0.1 ずつ調整していくと効率的です。
+      </div>
+
+      <div class="param">
+        <div class="param-top">
+          <span class="param-name">exaggeration</span>
+          <span class="param-badge">0.0 〜 1.0</span>
+        </div>
+        <div class="param-text">感情表現の強度。高いほど活気があり大げさな読み上げになります。掛け声や笑い声は高めに、うめき声は低めにすると自然です。</div>
+        <div class="param-bar">
+          <div class="bar-seg" style="flex:40; background:#ddd6cc;"></div>
+          <div class="bar-seg" style="flex:20; background:var(--accent-warm); opacity:0.5;"></div>
+          <div class="bar-seg" style="flex:40; background:var(--accent-warm);"></div>
+        </div>
+        <div class="param-labels">
+          <div class="param-lbl"><div class="param-dot" style="background:#ddd6cc;"></div>0.0〜0.4 落ち着いた表現</div>
+          <div class="param-lbl"><div class="param-dot" style="background:var(--accent-warm); opacity:0.5;"></div>0.5〜0.6 標準的な表現</div>
+          <div class="param-lbl"><div class="param-dot" style="background:var(--accent-warm);"></div>0.7〜1.0 大げさな表現</div>
+        </div>
+      </div>
+
+      <div class="param">
+        <div class="param-top">
+          <span class="param-name">cfg</span>
+          <span class="param-badge">0.0 〜 1.0</span>
+        </div>
+        <div class="param-text">参照音声への忠実度。高いほど元の声に近くなりますが、高すぎると不自然になる場合もあります。</div>
+        <div class="param-bar">
+          <div class="bar-seg" style="flex:30; background:#ddd6cc;"></div>
+          <div class="bar-seg" style="flex:30; background:var(--accent-warm); opacity:0.5;"></div>
+          <div class="bar-seg" style="flex:40; background:var(--accent-warm);"></div>
+        </div>
+        <div class="param-labels">
+          <div class="param-lbl"><div class="param-dot" style="background:#ddd6cc;"></div>0.0〜0.3 AIの自由度が高い</div>
+          <div class="param-lbl"><div class="param-dot" style="background:var(--accent-warm); opacity:0.5;"></div>0.4〜0.6 バランス型（おすすめ）</div>
+          <div class="param-lbl"><div class="param-dot" style="background:var(--accent-warm);"></div>0.7〜1.0 元の音声に酷似</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DST MOD への反映 -->
+    <section class="section">
+      <div class="section-label">DST MOD Integration</div>
+      <h2>DST MOD への反映</h2>
+      <div class="conclusion">
+        <h3>FMOD Designer での変換が必要です</h3>
+        <p>生成したWAVファイルをそのままDSTのMODに組み込むことはできません。<strong style="color:rgba(255,255,255,0.9);">FMOD Designer</strong> というツールを使って、WAVファイルをDSTが読み込める形式（<code style="background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.9);">.fev</code> + <code style="background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.9);">.fsb</code>）に変換する必要があります。</p>
+        <p style="margin-top:16px;">FMOD Designerの使い方については、専用のFMOD Designerプロジェクトフォルダ内のREADMEを参照してください。</p>
+      </div>
+    </section>
+
+    <!-- よくある質問 -->
+    <section class="section">
+      <div class="section-label">FAQ</div>
+      <h2>よくある質問</h2>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">別のキャラクターのMODを作りたい</div>
+        <div class="acc-body">
+          このプロジェクトをフォルダごとコピーして、以下を差し替えてください。
+          <div class="acc-steps">
+            <div class="acc-step"><div class="acc-icon">1</div><span><code>wav/</code> の参照音声ファイルを対象キャラのものに入れ替える</span></div>
+            <div class="acc-step"><div class="acc-icon">2</div><span><code>generate_voice.py</code> 上部の定数を新しいファイル名に合わせる</span></div>
+            <div class="acc-step"><div class="acc-icon">3</div><span><code>LINES</code> のテキスト・参照・パラメータを書き換える</span></div>
+          </div>
+          <div class="callout info" style="margin-bottom:0;">
+            <strong>ファイル名を変えたい場合</strong>
+            スクリプト名（<code>generate_voice.py</code>）を変更した場合は、<code>02_generate.bat</code> 内のファイル名も合わせて変更してください。
+          </div>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">英語以外のテキストは生成できる？</div>
+        <div class="acc-body">
+          Chatterbox TTSは主に英語に最適化されています。他の言語では品質が低下する可能性がありますが、試す価値はあります。
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">GPUを使いたい</div>
+        <div class="acc-body">
+          2つの変更が必要です。
+          <div class="acc-steps">
+            <div class="acc-step"><div class="acc-icon">1</div><span><code>01_setup.bat</code> のPyTorchインストール行をGPU対応版に変更する（<a href="https://pytorch.org/get-started/locally/">PyTorch公式サイト</a>で確認）</span></div>
+            <div class="acc-step"><div class="acc-icon">2</div><span><code>generate_voice.py</code> の <code>device="cpu"</code> を <code>device="cuda"</code> に変更する</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- トラブルシューティング -->
+    <section class="section">
+      <div class="section-label">Troubleshooting</div>
+      <h2>トラブルシューティング</h2>
+
+      <div class="acc open" onclick="this.classList.toggle('open')">
+        <div class="acc-head">Pythonが見つからないというエラーが出た</div>
+        <div class="acc-body">
+          Python 3.11がインストールされていないか、PATHに追加されていません。<a href="https://www.python.org/downloads/release/python-3119/">Python 3.11.9</a> をインストールし、「Add python.exe to PATH」にチェックを入れてください。
+          <div class="acc-steps">
+            <div class="acc-step"><div class="acc-icon">1</div><span><code>venv/</code> フォルダを削除する</span></div>
+            <div class="acc-step"><div class="acc-icon">2</div><span><code>01_setup.bat</code> を再実行する</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">torchやライブラリ関連のエラーが発生した</div>
+        <div class="acc-body">
+          仮想環境が破損している可能性があります。
+          <div class="acc-steps">
+            <div class="acc-step"><div class="acc-icon">1</div><span><code>venv/</code> フォルダを完全に削除する</span></div>
+            <div class="acc-step"><div class="acc-icon">2</div><span><code>01_setup.bat</code> を再実行してセットアップをやり直す</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">「SyntaxError」が表示された</div>
+        <div class="acc-body">
+          <code>generate_voice.py</code> の編集でPythonの文法エラーが発生しています。エラーメッセージの行番号付近を確認してください。
+          <div class="acc-steps">
+            <div class="acc-step"><div class="acc-icon">!</div><span>カンマ <code>,</code> の付け忘れ</span></div>
+            <div class="acc-step"><div class="acc-icon">!</div><span>ダブルクォーテーション <code>"</code> の閉じ忘れ</span></div>
+            <div class="acc-step"><div class="acc-icon">!</div><span>インデント（空白の数）がずれている</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">「Reference audio not found」というエラーが出た</div>
+        <div class="acc-body">
+          <code>wav/</code> フォルダに指定されたファイルが見つかりません。
+          <div class="acc-steps">
+            <div class="acc-step"><div class="acc-icon">1</div><span>ファイル名のスペルが <code>generate_voice.py</code> 上部の定数定義と完全に一致しているか確認</span></div>
+            <div class="acc-step"><div class="acc-icon">2</div><span>ファイルが <code>wav/</code> フォルダ直下に置かれているか確認（サブフォルダに入っていないか）</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">生成処理が遅い</div>
+        <div class="acc-body">
+          CPUのみでの生成は正常な動作で、1行あたり30秒〜数分かかります。高速化したい場合は NVIDIA GeForce RTX などのGPU導入を検討してください。
+        </div>
+      </div>
+
+      <div class="acc" onclick="this.classList.toggle('open')">
+        <div class="acc-head">モデルのダウンロードが失敗した</div>
+        <div class="acc-body">
+          ダウンロード用キャッシュが破損している可能性があります。
+          <div class="acc-steps">
+            <div class="acc-step"><div class="acc-icon">1</div><span><code>C:\Users\[ユーザー名]\.cache</code> フォルダを削除する</span></div>
+            <div class="acc-step"><div class="acc-icon">2</div><span><code>02_generate.bat</code> を再実行する</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    Chatterbox TTS — キャラクター音声ジェネレーター
+  </footer>
+
+</body>
+</html>

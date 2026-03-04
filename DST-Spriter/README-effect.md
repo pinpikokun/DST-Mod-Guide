@@ -1,0 +1,221 @@
+# エフェクトアニメーション編
+
+[← README.md に戻る](README.md)
+
+エフェクト（視覚効果）・投射物・範囲表示など、キャラクターやアイテム以外のアニメーションについて解説します。これらは MOD に演出を加えるために重要な要素です。
+
+---
+
+## エフェクトアニメーションとは
+
+DST の「エフェクト」とは、バフ・デバフの表示、爆発、煙、光などの **一時的な視覚効果** のことです。エフェクトはキャラクターやアイテムとは独立した存在（Prefab）として生成され、表示後に自動的に消えるものが多いです。
+
+### 主なエフェクトの種類
+
+| エフェクト | 説明 | 例 |
+|---|---|---|
+| バフ/デバフ表示 | キャラクターに付与される効果の表示 | シールド、毒、凍結 |
+| 爆発/煙 | 一瞬だけ表示される効果 | トラップの爆発、毒煙 |
+| ループエフェクト | 条件を満たす間ずっと表示される効果 | バリア、範囲表示 |
+
+---
+
+## 既存 Bank の流用パターン
+
+エフェクトアニメーションの大きな特徴は、**DST 本体の Bank をそのまま流用できる** ことです。Bank（動きの型）は既存のものを使い、Build（見た目）だけ自分で差し替えれば、動きのタイミングや表示方法が自動的に正しくなります。
+
+### よく使われる既存 Bank
+
+| Bank 名 | 元の用途 | 流用例 |
+|---|---|---|
+| `forcefield` | バリアシールド | バフ/デバフの表示 |
+| `poopcloud` | 肥料の煙 | 毒煙、爆発エフェクト |
+| `splash` | 水しぶき | 衝撃エフェクト |
+| `sparks` | 火花 | ヒットエフェクト |
+
+### 流用の具体例
+
+```
+Bank "forcefield" (DST本体のバリアの動き)
+  └── Build "my_shield_effect" (独自: シールド効果の見た目)
+
+Bank "poopcloud" (DST本体の煙の動き)
+  ├── Build "my_poison_smoke" (独自: 毒煙エフェクトの見た目)
+  └── Build "my_trap_explosion" (独自: トラップ爆発の見た目)
+```
+
+> **Tips**: 既存 Bank を流用するには、その Bank のアニメーション名（`idle`、`open`、`idle_loop` 等）を調べ、同じ名前のアニメーションとして Build を作ります。Bank が持つアニメーション名は、DST 本体の Spriter ファイルを参照するか、Lua コードから推測できます。
+
+---
+
+## エフェクトの Spriter での作り方
+
+### シンプルな 1 フレームエフェクト
+
+煙や爆発など、1 枚の画像を表示するだけのエフェクトはとても簡単です。
+
+1. 新規プロジェクトを作成する
+2. エフェクト画像（PNG）を 1 枚配置する
+3. Entity 名を流用する Bank 名に設定する（例: `poopcloud`）
+4. `idle` という名前のアニメーションを作成する
+
+### 開始 → ループのエフェクト
+
+バリアやシールドのように、「出現 → ループ表示」するエフェクトは 2 つのアニメーションが必要です。
+
+| アニメーション名 | 説明 |
+|---|---|
+| `open` | 出現時のアニメーション（1回再生） |
+| `idle_loop` | ループ表示（繰り返し再生） |
+
+### Lua 設定例
+
+```lua
+-- 1フレームエフェクト（煙エフェクトの例）
+local assets = {
+    Asset("ANIM", "anim/my_smoke_effect.zip"),
+}
+
+local function fn()
+    local inst = CreateEntity()
+    inst.entity:AddAnimState()
+
+    inst.AnimState:SetBank("poopcloud")
+    inst.AnimState:SetBuild("my_smoke_effect")
+    inst.AnimState:PlayAnimation("idle")
+
+    -- アニメーション終了後に自動削除
+    inst:ListenForEvent("animover", inst.Remove)
+
+    return inst
+end
+```
+
+```lua
+-- 開始→ループエフェクト（シールド効果の例）
+local assets = {
+    Asset("ANIM", "anim/my_shield_effect.zip"),
+}
+
+local function fn()
+    local inst = CreateEntity()
+    inst.entity:AddAnimState()
+
+    inst.AnimState:SetBank("forcefield")
+    inst.AnimState:SetBuild("my_shield_effect")
+    inst.AnimState:PlayAnimation("open")                -- まず出現アニメーション
+    inst.AnimState:PushAnimation("idle_loop", true)     -- 続けてループ
+
+    return inst
+end
+```
+
+---
+
+## 投射物アニメーション
+
+矢や弾のように飛んでいくものが「投射物」です。
+
+### 構成
+
+投射物には通常 2 つのアニメーションがあります。
+
+| アニメーション名 | 説明 |
+|---|---|
+| `idle_pipe` | 静止状態（手に持っている/発射前） |
+| `dart_pipe` | 飛行中の見た目 |
+
+### 向きの設定
+
+投射物は地面と平行に飛ぶため、`SetOrientation` で向きを設定する必要があります。
+
+```lua
+-- 投射物の設定例
+inst.AnimState:SetBank("blow_dart")
+inst.AnimState:SetBuild("blow_dart")
+inst.AnimState:PlayAnimation("dart_pipe")
+
+-- 地面と平行に表示する
+inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+```
+
+> **Note**: `ANIM_ORIENTATION.OnGround` を設定しないと、投射物が正面を向いたまま飛んでいく不自然な見た目になります。
+
+### 既存 Bank の流用
+
+DST 本体にはいくつかの投射物 Bank が用意されています。
+
+| Bank 名 | 元の用途 |
+|---|---|
+| `blow_dart` | 吹き矢 |
+| `fire_projectile` | 火の投射物 |
+| `ice_projectile` | 氷の投射物 |
+
+> **Tips**: 吹き矢系の武器を作る場合は `blow_dart` Bank を流用し、Build だけ差し替えるのが簡単です。
+
+---
+
+## 範囲表示アニメーション
+
+射程範囲やターゲットリングなど、ゲーム画面上に表示される UI 的なアニメーションです。
+
+### 特徴
+
+範囲表示は他のエフェクトと異なり、以下の特徴があります。
+
+| 特徴 | 説明 |
+|---|---|
+| 独自 Bank を使う | 既存 Bank の流用ではなく、自分で Bank を定義する |
+| クライアント側のみ | サーバーには存在せず、プレイヤーの画面にのみ表示される |
+| 地面に表示 | `SetOrientation(ANIM_ORIENTATION.OnGround)` を使う |
+| ループ再生 | 条件を満たす間ずっと表示し続ける |
+
+### Lua 設定例
+
+```lua
+-- 射程範囲リングの例
+local fx = CreateEntity()
+fx.entity:AddAnimState()
+
+fx.AnimState:SetBank("my_range_indicator")
+fx.AnimState:SetBuild("my_range_ring")
+fx.AnimState:PlayAnimation("idle", true)  -- ループ再生
+fx.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+```
+
+### 詳細サンプル
+
+範囲表示リングの Spriter での作り方は、本リポジトリに詳細なサンプルがあります。
+
+→ [README-blind-dart-renge-ring.md](sample/README-blind-dart-renge-ring.md) — ブラインドダートの射程範囲リング作成ガイド
+
+---
+
+## まとめ
+
+| 作るもの | Bank | Build | ポイント |
+|---|---|---|---|
+| バフ/デバフ表示 | `forcefield` 等（流用） | 独自 | `open` → `idle_loop` のパターン |
+| 爆発/煙 | `poopcloud` 等（流用） | 独自 | `idle` 1 フレームでOK。`animover` で自動削除 |
+| 投射物 | `blow_dart` 等（流用） | 独自 | `SetOrientation(OnGround)` を忘れずに |
+| 範囲表示 | 独自 | 独自 | クライアント側のみ。ループ再生 |
+
+### 既存 Bank を調べる方法
+
+使いたいエフェクトに近い DST 本体のエフェクトがあれば、以下の手順で Bank を調べられます。
+
+1. DST 本体の `scripts/prefabs/` フォルダから近いエフェクトの prefab ファイルを探す
+2. `SetBank("xxx")` の部分を確認する → これが Bank 名
+3. `PlayAnimation("yyy")` の部分を確認する → これが使えるアニメーション名
+
+> **Tips**: DST 本体のスクリプトは `C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\data\scripts\prefabs\` にあります。テキストエディタで開いて `SetBank` を検索すると、どんな Bank が使われているか確認できます。
+
+---
+
+[← README.md に戻る](README.md) | [アイテム・武器防具編 ←](README-item-equipment.md)
+
+---
+
+## ライセンス
+
+このドキュメントは自由に利用・改変・再配布できます。DST MOD 制作にお役立てください。
