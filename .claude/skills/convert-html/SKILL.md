@@ -1,3 +1,10 @@
+---
+name: convert-html
+disable-model-invocation: true
+description: |
+  /convert-html で呼び出す。MD ファイルを HTML に変換、または既存 HTML を MD の変更に合わせて更新する。
+---
+
 # MD → HTML 変換ルール
 
 ## MD と HTML の 1:1 対応
