@@ -33,8 +33,11 @@ DST の MOD（モッド）とは、ゲームに **自分だけのキャラクタ
 
 ### このガイドで扱わないもの（別途ガイドあり）
 
+> **おすすめ**: プログラミング不要で MOD を作りたい方は **[DST-AI-Agent ガイド](DST-AI-Agent/README.md)** をご覧ください。AI エージェントに指示するだけでキャラクター MOD を作成できます。
+
 | 内容 | 参照先ガイド |
 |---|---|
+| **AI エージェントを使った MOD 開発（おすすめ）** | **[DST-AI-Agent ガイド](DST-AI-Agent/README.md)** |
 | PNG から TEX ファイルへの変換 | [DST-TextureConverter ガイド](DST-TextureConverter/README.md) |
 | ゲームアセットのデコンパイル・TEX ↔ PNG 変換 | [DST-ktools ガイド](DST-ktools/README.md) |
 | アニメーションの詳細 | [DST-Spriter ガイド](DST-Spriter/README.md) |
@@ -45,7 +48,6 @@ DST の MOD（モッド）とは、ゲームに **自分だけのキャラクタ
 | Lua スクリプティング（キャラクター固有能力・カスタムコンポーネント・レシピ追加など） | [DST-Lua-Scripting ガイド](DST-Lua-Scripting/README.md) |
 | キャラクターのセリフ（Speech）カスタマイズ | [Speech ファイル作成ガイド](DST-Lua-Scripting/README-speech.md) |
 | MOD のコンフィグオプション（設定画面） | [modinfo コンフィグガイド](DST-Lua-Scripting/README-modinfo-config.md) |
-| AI エージェントを使った MOD 開発 | [DST-AI-Agent ガイド](DST-AI-Agent/README.md) |
 
 ### 対象読者
 
@@ -920,8 +922,11 @@ C:\Users\<ユーザー名>\Documents\Klei\DoNotStarveTogether\client_log.txt
 
 このリポジトリには、MOD 開発の各工程に特化した詳細ガイドが含まれています。
 
+> **おすすめ**: AI エージェントを使えば、プログラミング不要で MOD を作成できます。まずは **[DST-AI-Agent ガイド](DST-AI-Agent/README.md)** から始めるのがおすすめです。Claude Code / GitHub Copilot / Google Antigravity に対応しています。
+
 | ガイド | 内容 | リンク |
 |---|---|---|
+| **DST-AI-Agent** | **AI エージェントを使った MOD 開発（おすすめ）** | [DST-AI-Agent/README.md](DST-AI-Agent/README.md) |
 | **DST-Spriter** | アニメーション作成（キャラ・武器・エフェクト） | [DST-Spriter/README.md](DST-Spriter/README.md) |
 | **DST-TextureConverter** | PNG → TEX 画像変換の詳細手順 | [DST-TextureConverter/README.md](DST-TextureConverter/README.md) |
 | **DST-ktools** | ゲームアセットのデコンパイル・TEX ↔ PNG 変換 | [DST-ktools/README.md](DST-ktools/README.md) |
@@ -929,19 +934,18 @@ C:\Users\<ユーザー名>\Documents\Klei\DoNotStarveTogether\client_log.txt
 | **DST-Chatterbox** | AI 音声合成によるボイス生成 | [DST-Chatterbox/README.md](DST-Chatterbox/README.md) |
 | **Speech ファイル** | キャラクターのセリフカスタマイズ | [DST-Lua-Scripting/README-speech.md](DST-Lua-Scripting/README-speech.md) |
 | **modinfo コンフィグ** | MOD 設定画面のオプション作成 | [DST-Lua-Scripting/README-modinfo-config.md](DST-Lua-Scripting/README-modinfo-config.md) |
-| **DST-AI-Agent** | AI エージェントを使った MOD 開発 | [DST-AI-Agent/README.md](DST-AI-Agent/README.md) |
 
 ### おすすめの学習順序
 
-1. まずこのガイドで **見た目だけ変更したキャラクター** を作る
-2. [DST-Spriter ガイド](DST-Spriter/README.md) で **オリジナルアニメーション** の作り方を学ぶ
-3. [DST-TextureConverter ガイド](DST-TextureConverter/README.md) で **画像変換の詳細** を理解する
-4. [DST-ktools ガイド](DST-ktools/README.md) で **既存アセットのデコンパイル** を学ぶ
-5. [Speech ファイル作成ガイド](DST-Lua-Scripting/README-speech.md) で **キャラクターのセリフ** をカスタマイズする
-6. [modinfo コンフィグガイド](DST-Lua-Scripting/README-modinfo-config.md) で **設定オプション** を追加する
-7. [DST-FMOD-Designer ガイド](DST-FMOD-Designer/README.md) で **キャラクターボイス** を追加する
-8. [DST-Chatterbox ガイド](DST-Chatterbox/README.md) で **AI 音声** を作成する
-9. [DST-AI-Agent ガイド](DST-AI-Agent/README.md) で **AI エージェント** を使って MOD を作成する
+1. [DST-AI-Agent ガイド](DST-AI-Agent/README.md) で **AI エージェントを使って MOD を作成する**（おすすめ）
+2. まずこのガイドで **見た目だけ変更したキャラクター** を手動で作る
+3. [DST-Spriter ガイド](DST-Spriter/README.md) で **オリジナルアニメーション** の作り方を学ぶ
+4. [DST-TextureConverter ガイド](DST-TextureConverter/README.md) で **画像変換の詳細** を理解する
+5. [DST-ktools ガイド](DST-ktools/README.md) で **既存アセットのデコンパイル** を学ぶ
+6. [Speech ファイル作成ガイド](DST-Lua-Scripting/README-speech.md) で **キャラクターのセリフ** をカスタマイズする
+7. [modinfo コンフィグガイド](DST-Lua-Scripting/README-modinfo-config.md) で **設定オプション** を追加する
+8. [DST-FMOD-Designer ガイド](DST-FMOD-Designer/README.md) で **キャラクターボイス** を追加する
+9. [DST-Chatterbox ガイド](DST-Chatterbox/README.md) で **AI 音声** を作成する
 
 ---
 

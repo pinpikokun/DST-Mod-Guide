@@ -341,6 +341,29 @@
   }
   .card a { color: var(--accent-warm); text-decoration: none; font-size: 13px; }
   .card a:hover { text-decoration: underline; }
+  .card.featured {
+    grid-column: 1 / -1;
+    border: 2px solid var(--accent-warm);
+    background: linear-gradient(135deg, #fef8f5, #fff7f0);
+    padding: 28px 32px;
+  }
+  .card.featured h4 {
+    font-size: 18px;
+    color: var(--accent-warm);
+  }
+  .card.featured .desc { font-size: 15px; font-weight: 400; }
+  .card.featured a { font-size: 14px; font-weight: 600; }
+  .card.featured .featured-badge {
+    display: inline-block;
+    background: var(--accent-warm);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
 
   /* Spec grid */
   .spec-grid {
@@ -608,6 +631,12 @@
 
       <h3>関連ガイド（別途）</h3>
       <div class="card-grid">
+        <div class="card featured">
+          <span class="featured-badge">おすすめ</span>
+          <h4>DST-AI-Agent — AI エージェントで MOD を作る</h4>
+          <div class="desc">AI エージェント（Claude Code / GitHub Copilot / Google Antigravity）に指示を出すだけで、プログラミング不要でキャラクター MOD を作成できます。まずはここから始めるのがおすすめです。</div>
+          <a href="DST-AI-Agent/README.html">ガイドを開く →</a>
+        </div>
         <div class="card">
           <h4>DST-TextureConverter</h4>
           <div class="desc">PNG から TEX ファイルへの変換手順</div>
@@ -647,11 +676,6 @@
           <h4>modinfo コンフィグ</h4>
           <div class="desc">MOD のコンフィグオプション（設定画面）</div>
           <a href="DST-Lua-Scripting/README-modinfo-config.md">ガイドを開く →</a>
-        </div>
-        <div class="card">
-          <h4>DST-AI-Agent</h4>
-          <div class="desc">AI エージェントを使った MOD 開発</div>
-          <a href="DST-AI-Agent/README.html">ガイドを開く →</a>
         </div>
       </div>
     </section>
@@ -1365,6 +1389,12 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
       <p>MOD 開発の各工程に特化した詳細ガイドが含まれています。</p>
 
       <div class="card-grid">
+        <div class="card featured">
+          <span class="featured-badge">おすすめ</span>
+          <h4>DST-AI-Agent — AI エージェントで MOD を作る</h4>
+          <div class="desc">AI エージェント（Claude Code / GitHub Copilot / Google Antigravity）に指示を出すだけで、プログラミング不要でキャラクター MOD を作成できます。まずはここから始めるのがおすすめです。</div>
+          <a href="DST-AI-Agent/README.html">ガイドを開く →</a>
+        </div>
         <div class="card">
           <h4>DST-Spriter</h4>
           <div class="desc">アニメーション作成（キャラ・武器・エフェクト）</div>
@@ -1400,16 +1430,12 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
           <div class="desc">MOD 設定画面のオプション作成</div>
           <a href="DST-Lua-Scripting/README-modinfo-config.md">ガイドを開く →</a>
         </div>
-        <div class="card">
-          <h4>DST-AI-Agent</h4>
-          <div class="desc">AI エージェントを使った MOD 開発</div>
-          <a href="DST-AI-Agent/README.html">ガイドを開く →</a>
-        </div>
       </div>
 
       <h3>おすすめの学習順序</h3>
       <ol class="steps">
-        <li>まずこのガイドで見た目だけ変更したキャラクターを作る</li>
+        <li><strong><a href="DST-AI-Agent/README.html">DST-AI-Agent ガイド</a> で AI エージェントを使って MOD を作成する（おすすめ）</strong></li>
+        <li>まずこのガイドで見た目だけ変更したキャラクターを手動で作る</li>
         <li>DST-Spriter ガイドでオリジナルアニメーションの作り方を学ぶ</li>
         <li>DST-TextureConverter ガイドで画像変換の詳細を理解する</li>
         <li>DST-ktools ガイドで既存アセットのデコンパイルを学ぶ</li>
@@ -1417,7 +1443,6 @@ my_character\anim\ghost_my_character_build.zip</code></pre>
         <li><a href="DST-Lua-Scripting/README-modinfo-config.md">modinfo コンフィグガイド</a> で設定オプションを追加する</li>
         <li>DST-FMOD-Designer ガイドでキャラクターボイスを追加する</li>
         <li>DST-Chatterbox ガイドで AI 音声を作成する</li>
-        <li><a href="DST-AI-Agent/README.html">DST-AI-Agent ガイド</a> で AI エージェントを使って MOD を作成する</li>
       </ol>
     </section>
 
