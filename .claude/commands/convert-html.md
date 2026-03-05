@@ -1,12 +1,3 @@
----
-name: convert-html
-description: |
-  MD ファイルを HTML に変換する、または既存の HTML を MD の変更に合わせて更新するためのルール。
-  「HTML に変換して」「HTML 版を作って」「MD を更新したから HTML も直して」「HTML を同期して」
-  といったリクエストで使用する。MD と HTML の 1:1 対応を維持し、統一されたデザインシステムで
-  HTML を生成・更新する。
----
-
 # MD → HTML 変換ルール
 
 ## MD と HTML の 1:1 対応
